@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with AI</title>
+
+    <!-- 引入Vue2 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+
+    <!-- 引入axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+<body>
+
+<div id="app">
+    <h1>Chat with AI</h1>
+
+    <div class="conversation">
+        <!-- 显示对话内容 -->
+        <div v-for="(message, index) in messages" :key="index" class="message">
+            {{ message }}
+        </div>
+    </div>
+
+    <input type="text" v-model="userInput" @keyup.enter="sendMessage">
+
+    <button @click="sendMessage">发送</button>
+</div>
+
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                userInput: '',
+                messages: []
+            }
+        },
+        methods: {
+            sendMessage() {
+                const userMessage = {
+                    role: "user",
+                    content: this.userInput
+                }
+                this.messages.push(userMessage);
+                axios({
+                    method: 'post',
+                    url: '/v1/chat/completions',
+                    data: {
+                        model: 'gpt-3.5-turbo',
+                        messages: this.messages ,
+                        temperature: 0.7
+                    },
+                    headers: {
+                        Authorization: "Bearer sk-xxx"
+                    }
+                })
+                    .then(response => {
+                        // 接收到AI返回的内容后显示到对话界面
+                        this.messages.push(response.data.choices[0].message);
+                        this.userInput = '';
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            }
+        }
+    })
+</script>
+
+</body>
+</html>
