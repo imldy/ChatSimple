@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <textarea v-model="userInput" @keydown.enter.exact="sendMessage"></textarea>
+    <textarea v-model="userInput" @keyup.enter.exact="sendMessage"></textarea>
 
     <button @click="sendMessage">发送</button>
 </div>
