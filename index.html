@@ -69,6 +69,7 @@
                 const decoder = new TextDecoder("utf-8");
                 //获取body的reader
                 const reader = response.body.getReader();
+                const streamPrefix = "data: "
                 while (true) {
                     const {done, value} = await reader.read();
                     if (done) {
@@ -76,16 +77,15 @@
                     }
                     // 解码内容
                     const str = decoder.decode(value);
-                    let text_replaced = str.replaceAll("data: ", "")
-                    let text_list = text_replaced.split("\n")
-                    for (let key in text_list) {
-                        let text = text_list[key]
-                        if (text === "") continue
-                        if (text === "[DONE]") break
-                        let json = JSON.parse(text)
-                        if (json.choices[0].finish_reason === "stop") break
-                        assistantMessage.content += json.choices[0].delta.content;
-                    }
+                    let text_list = str.split("\n")
+                    text_list.forEach((element) => {
+                        if (element.startsWith(streamPrefix)) {
+                            const answer = element.substring(streamPrefix.length - 1)
+                            let json = JSON.parse(answer)
+                            if (json.choices[0].finish_reason !== "stop")
+                                assistantMessage.content += json.choices[0].delta.content;
+                        }
+                    })
                 }
             }
         }
