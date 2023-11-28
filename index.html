@@ -14,8 +14,13 @@
 
 <div id="app" class="container-xxl">
     <h1 class="bold">Chat with AI
-        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+        <button type="button" class="btn btn-light position-relative" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
         设置
+            <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle"
+                v-if="needCheckSetOptions"
+            >
+                <span class="visually-hidden">存在需确认的设置</span>
+            </span>
         </button>
     </h1>
     <div class="conversation">
@@ -87,6 +92,11 @@
                         model: "gpt-3.5-turbo-16k"
                     }
                 }
+            }
+        },
+        computed: {
+            needCheckSetOptions: function () {
+                return this.setOptions.API.apiKey.length !== 51;
             }
         },
         methods: {
