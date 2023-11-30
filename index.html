@@ -166,8 +166,10 @@
                     text_list.forEach((element) => {
                         if (element.startsWith(streamPrefix)) {
                             const answer = element.substring(streamPrefix.length - 1)
+                            if (answer.endsWith("[DONE]"))
+                                return
                             let json = JSON.parse(answer)
-                            if (json.choices[0].finish_reason !== "stop")
+                            if (json.choices[0].finish_reason !== "stop" && json.choices[0].content !== null)
                                 assistantMessage.content += json.choices[0].delta.content;
                         }
                     })
