@@ -33,8 +33,13 @@
     </h1>
     <div class="conversation">
         <!-- 显示对话内容 -->
-        <div v-for="(message, index) in messages" :key="index" class="message">
-            {{ message.role }}: <br>
+        <div v-for="(message, index) in messages" :key="index" class="message"
+        >
+            <label for="role" class="form-label">
+                <span class="badge"
+                      :class="roleColorMap[message.role]"
+                >{{ message.role }}</span>
+            </label>
             <p style="white-space: pre-wrap;">{{ message.content }}</p>
         </div>
     </div>
@@ -104,6 +109,11 @@
                         apiKey: "sk-xxx",
                         model: "gpt-3.5-turbo-16k"
                     }
+                },
+                roleColorMap: {
+                    system: "text-bg-primary",
+                    user: "text-bg-secondary",
+                    assistant: "text-bg-info"
                 }
             }
         },
