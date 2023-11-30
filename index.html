@@ -14,7 +14,9 @@
 
 <div id="app" class="container-xxl">
     <h1 class="bold">Chat with AI
-        <button type="button" class="btn btn-light position-relative" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+        <button type="button" class="btn btn-light position-relative" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+        @click="clickSetButton()"
+        >
         设置
             <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle"
                 v-if="needCheckSetOptions"
@@ -81,6 +83,20 @@
                                 v-model="setOptions.API.model"
                             >
                         </div>
+                        <div class="mb-3">
+                            <label for="temperatureInput" class="form-label">temperature</label>
+                            <div class="input-group">
+                                <span class="input-group-text" id="basic-addon2">{{ setOptions.API.temperature }}</span>
+                                <input type="range" class="form-control" id="temperature"
+                                       aria-describedby="temperatureHelp"
+                                       v-model="setOptions.API.temperature"
+                                       min="0.0" max="2.0" step="0.1"
+                                >
+                            </div>
+                            <div id="temperatureHelp" class="form-text">模型创造性与此数值成正相关，具体请查阅
+                                <a href="https://platform.openai.com/docs/guides/text-generation/how-should-i-set-the-temperature-parameter">OpenAI文档</a>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -104,10 +120,13 @@
                     }
                 ],
                 setOptions: {
+                    Version: 0.1,
+                    Read: false, // 是否已读设定
                     API: {
                         baseURL: "https://aihub.imldy.nl",
                         apiKey: "sk-xxx",
-                        model: "gpt-3.5-turbo-16k"
+                        model: "gpt-3.5-turbo-16k",
+                        temperature: 0.7,
                     }
                 },
                 roleColorMap: {
@@ -119,7 +138,9 @@
         },
         computed: {
             needCheckSetOptions: function () {
-                return this.setOptions.API.apiKey.length !== 51;
+                return this.setOptions.API.apiKey.length !== 51
+                    || !this.setOptions.Read // 未读
+                    ;
             }
         },
         methods: {
@@ -178,8 +199,30 @@
             loadSetOptions() {
                 const setOptions = JSON.parse(localStorage.getItem("setOptions"))
                 if (setOptions) {
+                    // 初版不存在版本号，约等于0
+                    if (setOptions.Version === undefined)
+                        setOptions.Version = 0.0
+                    // “设置”的版本迁移
+                    if(setOptions.Version < this.setOptions.Version){
+                        // 当小于时，依次判断小于的等级，依次根据版本增加属性
+                        if (setOptions.Version < 0.1){ // 在0升级至0.1版本中
+                            // 新增了温度设定
+                            setOptions.API.temperature = this.setOptions.API.temperature;
+                        }
+                        // 产品设计：每个设置选项的新版本都要让用户查看(新)设置项
+                        // 0.1增加“是否已读新设定”，默认为false
+                        // 所以只要涉及版本，就要设置为false(默认值)
+                        setOptions.Read = setOptions.Read = this.setOptions.Read;
+                        // 逻辑到这里，应该是添加完所有版本的新属性，所以将版本置为当前版本
+                        setOptions.Version = this.setOptions.Version
+                    }
+                    // 无论是否小于，逻辑到这里都要让Vue管理设置项
                     this.setOptions = setOptions;
                 }
+
+            },
+            clickSetButton() {
+                this.setOptions.Read = true
             }
         },
         watch: {
