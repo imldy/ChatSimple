@@ -86,7 +86,7 @@
                         <div class="mb-3">
                             <label for="temperatureInput" class="form-label">temperature</label>
                             <div class="input-group">
-                                <span class="input-group-text" id="basic-addon2">{{ setOptions.API.temperature }}</span>
+                                <span class="input-group-text" id="basic-addon2">{{ Number.parseFloat(setOptions.API.temperature).toFixed(1) }}</span>
                                 <input type="range" class="form-control" id="temperature"
                                        aria-describedby="temperatureHelp"
                                        v-model="setOptions.API.temperature"
