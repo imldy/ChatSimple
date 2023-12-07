@@ -95,7 +95,7 @@
                                 <span class="input-group-text" id="basic-addon2">{{ Number.parseFloat(setOptions.API.temperature).toFixed(1) }}</span>
                                 <input type="range" class="form-control" id="temperature"
                                        aria-describedby="temperatureHelp"
-                                       v-model="setOptions.API.temperature"
+                                       v-model.number="setOptions.API.temperature"
                                        min="0.0" max="2.0" step="0.1"
                                 >
                             </div>
